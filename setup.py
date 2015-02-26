@@ -1,10 +1,9 @@
-from distutils.core import setup 
-from distutils.core import Extension
+from distutils.core import setup, Extension
+from Cython.Build import cythonize
 
-module1 = Extension('tracking',
-        sources = ['demo.c'])
-
-setup (name = 'PackageName',
-        version = '1.0',
-        description = 'This is a demo package',
-        ext_modules = [module1])
+setup(ext_modules = cythonize(Extension(
+            "tracking",
+            sources=["tracking.pyx", "trackingmodule.cpp", "CompressiveTracker.cpp"],
+            libraries=["opencv_highgui", "opencv_core", "opencv_imgproc"],
+            language="c++",
+        )))
