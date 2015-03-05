@@ -8,7 +8,7 @@ cdef extern from "opencv2/opencv.hpp" namespace "cv":
         int x, y, width, height
 
 cdef extern from "trackingmodule.h":
-    cdef void track(int, int, string, Rect, vector[Rect])
+    cdef void singletrack(int, int, string, Rect, vector[Rect])
 
 def run_tracking(start, stop, string base_file_path, initial_rect):
     cdef vector[Rect] v

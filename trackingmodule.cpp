@@ -37,6 +37,7 @@ void singletrack(int start, int stop, string basePath, Rect initialBox, vector<R
     }
 }
 
+/*
 void bidirectionaltrack(int start, int stop, string basePath,
         Rect initialBox, Rect finalBox, vector<Rect> &boxes)
 {
@@ -56,3 +57,4 @@ void bidirectionaltrack(int start, int stop, string basePath,
         waitKey(10);
     }
 }
+*/
