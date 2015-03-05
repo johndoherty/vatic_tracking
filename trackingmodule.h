@@ -7,4 +7,7 @@
 #include <string.h>
 #include "CompressiveTracker.h"
 
-void track(int start, int stop, string basePath, Rect initialBox, vector<Rect> &boxes);
+void alltracks(int start, int stop, string basePath, vector<Rect> &boxes);
+void singletrack(int start, int stop, string basePath, Rect initialBox, vector<Rect> &boxes);
+void bidirectionaltrack(int start, int stop, string basePath,
+        Rect initialBox, Rect finalBox, vector<Rect> &boxes);

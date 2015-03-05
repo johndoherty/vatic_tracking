@@ -19,7 +19,7 @@ def run_tracking(start, stop, string base_file_path, initial_rect):
     cdef int width = int(initial_rect[2])
     cdef int height = int(initial_rect[3])
     cdef Rect *r = new Rect(x, y, width, height)
-    track(start_frame, stop_frame, base_file_path, deref(r), v)
+    singletrack(start_frame, stop_frame, base_file_path, deref(r), v)
     ret = []
     for i in range(0, v.size()-1, 5):
         out_rect_python = {'rect':(v[i].x, v[i].y, v[i].width, v[i].height), 'frame':i, 'generated':(i!=0)}
