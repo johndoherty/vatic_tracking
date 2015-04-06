@@ -5,9 +5,50 @@
 #include <sstream>
 #include <stdio.h>
 #include <string.h>
-#include "CompressiveTracker.h"
+#include <vector>
+#include <map>
 
-void alltracks(int start, int stop, string basePath, vector<Rect> &boxes);
-void singletrack(int start, int stop, string basePath, Rect initialBox, vector<Rect> &boxes);
-void bidirectionaltrack(int start, int stop, string basePath,
-        Rect initialBox, Rect finalBox, vector<Rect> &boxes);
+class Track {
+public:
+    int start;
+    int stop;
+    std::vector<cv::Rect> boxes;
+};
+
+class Tracker {
+public:
+    Tracker() {};
+    void getFrame(int frame, std::string basepath, cv::Mat& out, bool color=true);
+};
+
+class ForwardTracker: public Tracker {
+public:
+    ForwardTracker() {};
+    virtual void singletrack(int start, int stop, cv::Rect initialBox, std::string basePath, Track &track) = 0;
+};
+
+class BidirectionalTracker: public Tracker {
+public:
+    BidirectionalTracker() {};
+    virtual void bidirectionaltrack(int start, int stop, cv::Rect initialBox, cv::Rect finalBox, std::string basePath, Track &track) = 0;
+};
+
+class FullTracker: public Tracker {
+public:
+    FullTracker() {};
+    virtual void alltracks(int start, int stop, std::string basePath, std::vector<Track> &tracks) = 0;
+};
+
+class CompressiveTrackerModule: public ForwardTracker {
+public:
+    CompressiveTrackerModule() {};
+    void singletrack(int start, int stop, cv::Rect initialBox, std::string basePath, Track &track);
+};
+
+void getForwardTrackers(std::map<std::string, ForwardTracker*> &trackers);
+void getBidirectionalTrackers(std::map<std::string, BidirectionalTracker*> &trackers);
+void getFullTrackers(std::map<std::string, FullTracker*> &trackers);
+
+void getForwardTrackerKeys(std::vector<std::string> &keys);
+void getBidirectionalTrackerKeys(std::vector<std::string> &keys);
+void getFullTrackerKeys(std::vector<std::string> &keys);
