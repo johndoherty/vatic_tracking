@@ -29,5 +29,3 @@ void CompressiveTrackerModule::singletrack(int start, int stop, Rect initialBox,
         waitKey(10);*/
     }
 }
-
-

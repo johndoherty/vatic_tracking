@@ -45,6 +45,14 @@ public:
     void singletrack(int start, int stop, cv::Rect initialBox, std::string basePath, Track &track);
 };
 
+class BidirectionalTrackerModule: public BidirectionalTracker {
+private:
+    float boxdistance(cv::Rect box1, cv::Rect box2);
+public:
+    BidirectionalTrackerModule() {};
+    void bidirectionaltrack(int start, int stop, cv::Rect initialBox, cv::Rect finalBox, std::string basePath, Track &track);
+};
+
 void getForwardTrackers(std::map<std::string, ForwardTracker*> &trackers);
 void getBidirectionalTrackers(std::map<std::string, BidirectionalTracker*> &trackers);
 void getFullTrackers(std::map<std::string, FullTracker*> &trackers);

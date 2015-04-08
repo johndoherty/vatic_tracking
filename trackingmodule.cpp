@@ -4,13 +4,15 @@ using namespace std;
 using namespace cv;
 
 void Tracker::getFrame(int frame, string basePath, Mat& out, bool color) {
+    Mat tmp;
     stringstream ss;
     int folder1 = frame / 100;
     int folder2 = frame / 10000;
     ss << basePath << "/" << folder2 << "/" << folder1 << "/" << frame << ".jpg"; 
     string path = ss.str();
 
-    out = imread(path);
+    tmp = imread(path);
+    tmp.copyTo(out);
     if (!color) {
         cvtColor(out, out, CV_RGB2GRAY);
     }
@@ -25,6 +27,7 @@ void getForwardTrackers(map<string, ForwardTracker*> &trackers) {
 
 void getBidirectionalTrackers(map<string, BidirectionalTracker*> &trackers) {
     trackers.clear();
+    trackers["Compressive-Bidirectional"] = new BidirectionalTrackerModule();
 }
 
 void getFullTrackers(map<string, FullTracker*> &trackers) {

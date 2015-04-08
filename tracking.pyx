@@ -89,8 +89,26 @@ def getfulltrackers():
         out.append(v[i])
     return out
 
+def runbidirectionaltracker(string tracker, start, stop, string basepath, initialrect, finalrect):
+    cdef Track track
+    cdef int startframe = int(start)
+    cdef int stopframe = int(stop)
+    cdef int initialx = int(initialrect[0])
+    cdef int initialy = int(initialrect[1])
+    cdef int initialwidth = int(initialrect[2])
+    cdef int initialheight = int(initialrect[3])
+    cdef int finalx = int(finalrect[0])
+    cdef int finaly = int(finalrect[1])
+    cdef int finalwidth = int(finalrect[2])
+    cdef int finalheight = int(finalrect[3])
+    cdef Rect *initialr = new Rect(initialx, initialy, initialwidth, initialheight)
+    cdef Rect *finalr = new Rect(finalx, finaly, finalwidth, finalheight)
+    cdef BidirectionalTracker *t = bidirectionaltrackers[tracker]
+    print "Tracking from: {0} to {1}".format(start, stop)
+    t.bidirectionaltrack(startframe, stopframe, deref(initialr), deref(finalr), basepath, track)
+    return tracktorects(track)
+
 def runforwardtracker(string tracker, start, stop, string basepath, initialrect):
-    cdef vector[Rect] v
     cdef Track track
     cdef int startframe = int(start)
     cdef int stopframe = int(stop)
