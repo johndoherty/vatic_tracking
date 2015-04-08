@@ -28,9 +28,9 @@ cdef extern from "trackingmodule.h":
     cdef void getBidirectionalTrackers(map[string, BidirectionalTracker*])
     cdef void getFullTrackers(map[string, FullTracker*])
 
-    cdef void getForwardTrackerKeys(vector[string]);
-    cdef void getBidirectionalTrackerKeys(vector[string]);
-    cdef void getFullTrackerKeys(vector[string]);
+    cdef void getForwardTrackerKeys(vector[string])
+    cdef void getBidirectionalTrackerKeys(vector[string])
+    cdef void getFullTrackerKeys(vector[string])
 
 cdef map[string, ForwardTracker*] forwardtrackers
 cdef map[string, BidirectionalTracker*] bidirectionaltrackers
