@@ -19,7 +19,7 @@ cdef extern from "trackingmodule.h":
         void singletrack(int, int, Rect, string, Track)
 
     cdef cppclass BidirectionalTracker:
-        void bidirectionaltrack(int, int, Rect, Rect, string, Track);
+        void bidirectionaltrack(int, int, Rect, Rect, string, Track)
 
     cdef cppclass FullTracker:
         void alltracks(int, int, string, vector[Track])
