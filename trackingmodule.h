@@ -12,6 +12,7 @@ class Track {
 public:
     int start;
     int stop;
+    std::string label;
     std::vector<cv::Rect> boxes;
 };
 
@@ -24,13 +25,13 @@ public:
 class ForwardTracker: public Tracker {
 public:
     ForwardTracker() {};
-    virtual void singletrack(int start, int stop, cv::Rect initialBox, std::string basePath, Track &track) = 0;
+    virtual void singletrack(cv::Rect initialBox, std::string basePath, Track &track) = 0;
 };
 
 class BidirectionalTracker: public Tracker {
 public:
     BidirectionalTracker() {};
-    virtual void bidirectionaltrack(int start, int stop, cv::Rect initialBox, cv::Rect finalBox, std::string basePath, Track &track) = 0;
+    virtual void bidirectionaltrack(cv::Rect initialBox, cv::Rect finalBox, std::string basePath, Track &track) = 0;
 };
 
 class FullTracker: public Tracker {
@@ -42,7 +43,7 @@ public:
 class CompressiveTrackerModule: public ForwardTracker {
 public:
     CompressiveTrackerModule() {};
-    void singletrack(int start, int stop, cv::Rect initialBox, std::string basePath, Track &track);
+    void singletrack(cv::Rect initialBox, std::string basePath, Track &track);
 };
 
 class BidirectionalTrackerModule: public BidirectionalTracker {
@@ -50,8 +51,16 @@ private:
     float boxdistance(cv::Rect box1, cv::Rect box2);
 public:
     BidirectionalTrackerModule() {};
-    void bidirectionaltrack(int start, int stop, cv::Rect initialBox, cv::Rect finalBox, std::string basePath, Track &track);
+    void bidirectionaltrack(cv::Rect initialBox, cv::Rect finalBox, std::string basePath, Track &track);
 };
+
+class RandomFullTracker: public FullTracker {
+public:
+    RandomFullTracker() {};
+    void alltracks(int start, int stop, std::string basePath, std::vector<Track> &tracks);
+};
+
+
 
 void getForwardTrackers(std::map<std::string, ForwardTracker*> &trackers);
 void getBidirectionalTrackers(std::map<std::string, BidirectionalTracker*> &trackers);

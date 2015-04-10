@@ -32,6 +32,7 @@ void getBidirectionalTrackers(map<string, BidirectionalTracker*> &trackers) {
 
 void getFullTrackers(map<string, FullTracker*> &trackers) {
     trackers.clear();
+    trackers["RandomTestTracker"] = new RandomFullTracker();
 }
 
 template<typename T> void getKeyForMap(map<string, T> m, vector<string>& v) {

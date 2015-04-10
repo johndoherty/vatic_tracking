@@ -1,3 +1,8 @@
+/* Simple Bidirectional tracking module to serve as reference
+ * Basically runs Compressive tracking forwards and backwards and tries to merge tracks
+ *
+ */
+
 #include "trackingmodule.h"
 #include "CompressiveTracker.h"
 #include <math.h>
@@ -7,9 +12,9 @@ float BidirectionalTrackerModule::boxdistance(Rect box1, Rect box2)
     return sqrt(pow((box1.x - box2.x), 2) + pow((box1.y - box2.y), 2));
 }
 
-void BidirectionalTrackerModule::bidirectionaltrack(int start, int stop, cv::Rect initialBox, cv::Rect finalBox, std::string basePath, Track &track)
+void BidirectionalTrackerModule::bidirectionaltrack(cv::Rect initialBox, cv::Rect finalBox, std::string basePath, Track &track)
 {
-    int totalboxes = stop-start;
+    int totalboxes = track.stop-track.start;
     if (totalboxes  == 0) return;
     CompressiveTracker forwardtracker, backwardtracker;
     vector<Rect> forwardboxes, backwardboxes;
@@ -17,8 +22,8 @@ void BidirectionalTrackerModule::bidirectionaltrack(int start, int stop, cv::Rec
     Rect forwardbox = initialBox;
     Rect backwardbox = finalBox;
     Mat forwardgray, backwardgray;
-    getFrame(start, basePath, forwardgray, false);
-    getFrame(stop, basePath, backwardgray, false);
+    getFrame(track.start, basePath, forwardgray, false);
+    getFrame(track.stop, basePath, backwardgray, false);
 
     forwardtracker.init(forwardgray, forwardbox);
     backwardtracker.init(backwardgray, backwardbox);
@@ -26,8 +31,8 @@ void BidirectionalTrackerModule::bidirectionaltrack(int start, int stop, cv::Rec
     backwardit = backwardboxes.begin();
     backwardboxes.insert(backwardit, backwardbox);
     for (int i=1; i < totalboxes; i++) {
-        getFrame(start+i, basePath, forwardgray, false);
-        getFrame(stop-i, basePath, backwardgray, false);
+        getFrame(track.start+i, basePath, forwardgray, false);
+        getFrame(track.stop-i, basePath, backwardgray, false);
         forwardtracker.processFrame(forwardgray, forwardbox);
         backwardtracker.processFrame(backwardgray, backwardbox);
         forwardboxes.push_back(forwardbox);

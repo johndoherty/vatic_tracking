@@ -14,12 +14,13 @@ cdef extern from "trackingmodule.h":
     cdef cppclass Track:
         int start, stop
         vector[Rect] boxes
+        string label
 
     cdef cppclass ForwardTracker:
-        void singletrack(int, int, Rect, string, Track)
+        void singletrack(Rect, string, Track)
 
     cdef cppclass BidirectionalTracker:
-        void bidirectionaltrack(int, int, Rect, Rect, string, Track)
+        void bidirectionaltrack(Rect, Rect, string, Track)
 
     cdef cppclass FullTracker:
         void alltracks(int, int, string, vector[Track])
@@ -89,8 +90,18 @@ def getfulltrackers():
         out.append(v[i])
     return out
 
-def runbidirectionaltracker(string tracker, start, stop, string basepath, initialrect, finalrect):
-    cdef Track track
+def runfulltracker(string tracker, start, stop, string basepath):
+    cdef vector[Track] tracks
+    cdef FullTracker *t = fulltrackers[tracker]
+    cdef int startframe = int(start)
+    cdef int stopframe = int(stop)
+    t.alltracks(startframe, stopframe, basepath, tracks)
+    ret = []
+    for i in range(tracks.size()):
+        ret.append(tracktorects(tracks[i]))
+    return ret
+
+def runbidirectionaltracker(string tracker, string label, start, stop, string basepath, initialrect, finalrect):
     cdef int startframe = int(start)
     cdef int stopframe = int(stop)
     cdef int initialx = int(initialrect[0])
@@ -104,12 +115,14 @@ def runbidirectionaltracker(string tracker, start, stop, string basepath, initia
     cdef Rect *initialr = new Rect(initialx, initialy, initialwidth, initialheight)
     cdef Rect *finalr = new Rect(finalx, finaly, finalwidth, finalheight)
     cdef BidirectionalTracker *t = bidirectionaltrackers[tracker]
-    print "Tracking from: {0} to {1}".format(start, stop)
-    t.bidirectionaltrack(startframe, stopframe, deref(initialr), deref(finalr), basepath, track)
+    cdef Track track
+    track.start = startframe
+    track.stop = stopframe
+    track.label = label
+    t.bidirectionaltrack(deref(initialr), deref(finalr), basepath, track)
     return tracktorects(track)
 
-def runforwardtracker(string tracker, start, stop, string basepath, initialrect):
-    cdef Track track
+def runforwardtracker(string tracker, string label, start, stop, string basepath, initialrect):
     cdef int startframe = int(start)
     cdef int stopframe = int(stop)
     cdef int x = int(initialrect[0])
@@ -118,8 +131,11 @@ def runforwardtracker(string tracker, start, stop, string basepath, initialrect)
     cdef int height = int(initialrect[3])
     cdef Rect *r = new Rect(x, y, width, height)
     cdef ForwardTracker *t = forwardtrackers[tracker]
-    print "Tracking from: {0} to {1}".format(start, stop)
-    t.singletrack(startframe, stopframe, deref(r), basepath, track)
+    cdef Track track
+    track.start = startframe
+    track.stop = stopframe
+    track.label = label
+    t.singletrack(deref(r), basepath, track)
     return tracktorects(track)
 
 #rects = run_tracking(67, 321, "/Users/john/Dropbox/School/JackRabbot/Jackrabbot/front_end/vatic/public/frames/video1", (150, 220, 40, 45))
