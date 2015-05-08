@@ -3,7 +3,7 @@
 using namespace std;
 using namespace cv;
 
-void Tracker::getFrame(int frame, string basePath, Mat& out, bool color) {
+void getFrame(int frame, string basePath, Mat& out, bool color) {
     Mat tmp;
     stringstream ss;
     int folder1 = frame / 100;
@@ -20,6 +20,7 @@ void Tracker::getFrame(int frame, string basePath, Mat& out, bool color) {
 
 
 // This is where you initialize tracking algorithms
+/*
 void getForwardTrackers(map<string, ForwardTracker*> &trackers) {
     trackers.clear();
     trackers["Compressive"] = new CompressiveTrackerModule();
@@ -60,7 +61,6 @@ void getFullTrackerKeys(vector<string> &keys) {
     getKeyForMap<FullTracker*>(m, keys);
 }
 
-/*
 void bidirectionaltrack(int start, int stop, string basePath,
         Rect initialBox, Rect finalBox, vector<Rect> &boxes)
 {

@@ -7,14 +7,16 @@
 #include "CompressiveTracker.h"
 #include <math.h>
 
-float BidirectionalTrackerModule::boxdistance(Rect box1, Rect box2)
+float boxdistance(Rect box1, Rect box2)
 {
-    return sqrt(pow((box1.x - box2.x), 2) + pow((box1.y - box2.y), 2));
+    return sqrt(pow((box1.x - box2.x), 2) +
+        pow((box1.y - box2.y), 2));
 }
 
-void BidirectionalTrackerModule::bidirectionaltrack(cv::Rect initialBox, cv::Rect finalBox, std::string basePath, Track &track)
+void bidirectionaltrack(cv::Rect initialBox, cv::Rect finalBox,
+    std::string basePath, int start, int stop, vector<cv::Rect> &boxes)
 {
-    int totalboxes = track.stop-track.start;
+    int totalboxes = stop-start;
     if (totalboxes  == 0) return;
     CompressiveTracker forwardtracker, backwardtracker;
     vector<Rect> forwardboxes, backwardboxes;
@@ -22,8 +24,8 @@ void BidirectionalTrackerModule::bidirectionaltrack(cv::Rect initialBox, cv::Rec
     Rect forwardbox = initialBox;
     Rect backwardbox = finalBox;
     Mat forwardgray, backwardgray;
-    getFrame(track.start, basePath, forwardgray, false);
-    getFrame(track.stop, basePath, backwardgray, false);
+    getFrame(start, basePath, forwardgray, false);
+    getFrame(stop, basePath, backwardgray, false);
 
     forwardtracker.init(forwardgray, forwardbox);
     backwardtracker.init(backwardgray, backwardbox);
@@ -31,8 +33,8 @@ void BidirectionalTrackerModule::bidirectionaltrack(cv::Rect initialBox, cv::Rec
     backwardit = backwardboxes.begin();
     backwardboxes.insert(backwardit, backwardbox);
     for (int i=1; i < totalboxes; i++) {
-        getFrame(track.start+i, basePath, forwardgray, false);
-        getFrame(track.stop-i, basePath, backwardgray, false);
+        getFrame(start+i, basePath, forwardgray, false);
+        getFrame(stop-i, basePath, backwardgray, false);
         forwardtracker.processFrame(forwardgray, forwardbox);
         backwardtracker.processFrame(backwardgray, backwardbox);
         forwardboxes.push_back(forwardbox);
@@ -66,9 +68,9 @@ void BidirectionalTrackerModule::bidirectionaltrack(cv::Rect initialBox, cv::Rec
 
     for (int i=0; i < totalboxes; i++) {
         if (i < mergeframe) {
-            track.boxes.push_back(forwardboxes[i]);
+            boxes.push_back(forwardboxes[i]);
         } else {
-            track.boxes.push_back(backwardboxes[i]);
+            boxes.push_back(backwardboxes[i]);
         }
     }
 }

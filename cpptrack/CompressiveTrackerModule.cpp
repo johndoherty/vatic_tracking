@@ -2,20 +2,21 @@
 #include "CompressiveTracker.h"
 
 
-void CompressiveTrackerModule::singletrack(Rect initialBox, string basePath, Track &track)
+void compressivetrack(Rect initialBox, string basePath,
+    int start, int stop, vector<Rect> &boxes)
 {
     CompressiveTracker ct;
     Rect box = initialBox;
     Mat gray;
-    getFrame(track.start, basePath, gray, false);
-    std::cout << track.label << std::endl;
+    getFrame(start, basePath, gray, false);
+    //std::cout << label << std::endl;
 
     ct.init(gray, box);
-    track.boxes.push_back(box);
-    for (int i=track.start+1; i <= track.stop; i++) {
+    boxes.push_back(box);
+    for (int i = start+1; i <= stop; i++) {
         getFrame(i, basePath, gray, false);
         ct.processFrame(gray, box);
-        track.boxes.push_back(box);
+        boxes.push_back(box);
         /*rectangle(gray, box, Scalar(0));
         std::cout << gray.size() << std::endl;
         std::stringstream ss;
