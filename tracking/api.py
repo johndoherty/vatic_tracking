@@ -14,7 +14,14 @@ multiobjecttrackers = {}
 multiobjecttrackers.update(pytrack.multiobject)
 multiobjecttrackers.update(cpptrack.multiobject)
 
-def online(tracker, label, start, stop, basepath, initialrect, pathid, paths):
+def gettrackers():
+    return {
+        "online": onlinetrackers.keys(),
+        "bidirectional": bidirectionaltrackers.keys(),
+        "multiobject": multiobjecttrackers.keys()
+    }
+
+def online(tracker, start, stop, basepath, initialrect, pathid, paths):
     if tracker in onlinetrackers:
         paths = convertpaths(paths)
         return onlinetrackers[tracker].track(tracker, label, start, stop, basepath, initialrect)

@@ -1,4 +1,5 @@
 from base import Path
+import cv2
 
 def convertpaths(paths):
     convertedpaths = []
@@ -11,3 +12,5 @@ def convertpaths(paths):
         ))
 
     return convertedpaths
+
+

@@ -1,1 +1,5 @@
-from pytrack import online, bidirectional, multiobject
+from meanshift import MeanShift
+
+online = {"Mean Shift": MeanShift}
+bidirectional = {}
+multiobject = {}
