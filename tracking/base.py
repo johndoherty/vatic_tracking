@@ -7,7 +7,7 @@ Path = namedtuple("Path", [
 ])
 
 class Online:
-    def track(self, pathid, start, stop, initialrect, basepath, paths):
+    def track(self, pathid, start, stop, basepath, paths):
         raise NotImplementedError("Must implement the tracking method")
 
 class Bidirectional:

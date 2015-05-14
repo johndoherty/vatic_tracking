@@ -1,5 +1,6 @@
 import pytrack
 import cpptrack
+from utils import filterboxes
 
 
 onlinetrackers = {}
@@ -21,21 +22,19 @@ def gettrackers():
         "multiobject": multiobjecttrackers.keys()
     }
 
-def online(tracker, start, stop, basepath, initialrect, pathid, paths):
+def online(tracker, start, stop, basepath, pathid, paths):
     if tracker in onlinetrackers:
-        paths = convertpaths(paths)
-        return onlinetrackers[tracker].track(tracker, label, start, stop, basepath, initialrect)
+        tracker = onlinetrackers[tracker]()
+        return filterboxes(tracker.track(pathid, start, stop, basepath, paths))
     return None
 
 def multiobject(tracker, start, stop, basepath, initialrect, paths):
     if tracker in multiobjecttrackers:
-        paths = convertpaths(paths)
         return multiobjecttrackers[tracker].track(tracker, start, stop, basepath, paths)
     return None
 
 def bidirectional(tracker, label, start, stop, basepath, initialrect, paths):
     if tracker in bidirectionaltrackers:
-        paths = convertpaths(paths)
         return bidirectionaltrackers[tracker].track(tracker, label, start, stop, basepath, initialrect)
     return None
 

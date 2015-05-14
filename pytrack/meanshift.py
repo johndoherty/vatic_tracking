@@ -4,11 +4,13 @@ from tracking.base import Online
 from utils import getframes
 
 class MeanShift(Online):
-    def track(self, pathid, start, stop, initialrect, basepath, paths):
+    def track(self, pathid, start, stop, basepath, paths):
         frames = getframes(basepath, True)
         frame = frames[start]
 
         # setup initial location of window
+        box = paths[pathid].boxes[start]
+        initialrect = (box.xtl, box.ytl, box.xbr-box.xtl, box.ybr-box.ytl)
         c,r,w,h = initialrect
         rect = initialrect
  
@@ -32,17 +34,20 @@ class MeanShift(Online):
 
             # apply meanshift to get the new location
             _, rect = cv2.meanShift(dst, rect, term_crit)
+            outrect = {
+                'rect':(boxes[i].x, boxes[i].y, boxes[i].width, boxes[i].height),
+                'frame':i,
+                'generated':(i!=0)
+            }
+            ret.append(outrect)
+
+
 
             # Draw it on image
-            x,y,w,h = rect
-            img2 = cv2.rectangle(frame, (x,y), (x+w,y+h), 255,2)
-            cv2.imshow('img2',img2)
-
-            k = cv2.waitKey(60) & 0xff
-            if k == 27:
-                break
-            else:
-                cv2.imwrite(chr(k)+".jpg",img2)
+            #x,y,w,h = rect
+            #cv2.rectangle(frame, (x,y), (x+w,y+h), 255,2)
+            #cv2.imshow('img2',frame)
+            #cv2.waitKey(60)
 
 
         cv2.destroyAllWindows()

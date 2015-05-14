@@ -3,8 +3,9 @@ from libcpp.string cimport string
 from libcpp.vector cimport vector
 from libcpp.map cimport map
 from cython.operator cimport dereference as deref
+import vision
+from tracking.base import Path
 
-TRACKING_INTERVAL = 10
 
 cdef extern from "opencv2/opencv.hpp" namespace "cv":
     cdef cppclass Rect:
@@ -27,29 +28,20 @@ cdef extern from "trackingmodule.h":
     cdef void alltracks(int start, int stop, string basePath,
         vector[vector[Rect]] boxes)
 
-cdef boxestorects(vector[Rect] boxes):
-    ret = []
-    for i in range(0, boxes.size()-1, TRACKING_INTERVAL):
-        outrect = {
-            'rect':(boxes[i].x, boxes[i].y, boxes[i].width, boxes[i].height),
-            'frame':i,
-            'generated':(i!=0)
-        }
-        ret.append(outrect)
-
-    lastframe = boxes.size() - 1
-    lastrect = {
-        'rect':(
-            boxes[lastframe].x,
-            boxes[lastframe].y,
-            boxes[lastframe].width,
-            boxes[lastframe].height
-        ),
-        'frame':lastframe,
-        'generated':True,
-    }
-    ret.append(lastrect)
-    return ret
+cdef boxestopath(vector[Rect] boxes, originalpath, start):
+    pathboxes = {}
+    for i in range(boxes.size()):
+        generated = 0 if i == start else 1
+        frame = start + i
+        pathboxes[frame] = vision.Box(
+            boxes[i].x,
+            boxes[i].y,
+            boxes[i].x + boxes[i].width,
+            boxes[i].y + boxes[i].height,
+            frame=frame,
+            generated=generated
+        )
+    return Path(originalpath.label, originalpath.id, pathboxes)
 
 cdef pyrecttorect(pyrect, Rect& r):
     r.x = int(pyrect[0])
@@ -58,12 +50,15 @@ cdef pyrecttorect(pyrect, Rect& r):
     r.height = int(pyrect[3])
 
 class Compressive(Online):
-    def track(self, pathid, int start, int stop, initialrect, string basepath, paths):
+    def track(self, pathid, int start, int stop, string baseimagepath, paths):
         cdef vector[Rect] boxes
         cdef Rect r
+        path = paths[pathid]
+        box = path.boxes[start]
+        initialrect = (box.xtl, box.ytl, box.xbr-box.xtl, box.ybr-box.ytl)
         pyrecttorect(initialrect, r)
-        compressivetrack(r, basepath, start, stop, boxes)
-        return boxestorects(boxes)
+        compressivetrack(r, baseimagepath, start, stop, boxes)
+        return boxestopath(boxes, path, start)
 
 online = {
     "Compressive": Compressive,
