@@ -22,7 +22,7 @@ cdef extern from "trackingmodule.h":
     cdef void compressivetrack(Rect initialBox, string basepath,
         int start, int stop, vector[Rect] boxes)
 
-    cdef void bidirectionaltrack(initialBox, Rect finalBox, string basePath,
+    cdef void bidirectionaltrack(Rect initialBox, Rect finalBox, string basePath,
         int start, int stop, vector[Rect] boxes)
 
     cdef void alltracks(int start, int stop, string basePath,
@@ -60,11 +60,30 @@ class Compressive(Online):
         compressivetrack(r, baseimagepath, start, stop, boxes)
         return boxestopath(boxes, path, start)
 
+class BidirectionalCompressive(Bidirectional):
+    def track(self, pathid, int start, int stop, string baseimagepath, paths):
+        cdef vector[Rect] boxes
+        cdef Rect initial
+        cdef Rect final
+        path = paths[pathid]
+        startbox = path.boxes[start]
+        stopbox = path.boxes[stop]
+        initialrect = (startbox.xtl, startbox.ytl, startbox.xbr-startbox.xtl, startbox.ybr-startbox.ytl)
+        finalrect = (stopbox.xtl, stopbox.ytl, stopbox.xbr-stopbox.xtl, stopbox.ybr-stopbox.ytl)
+        pyrecttorect(initialrect, initial)
+        pyrecttorect(finalrect, final)
+        bidirectionaltrack(initial, final, baseimagepath, start, stop, boxes)
+        return boxestopath(boxes, path, start)
+    
+
 online = {
     "Compressive": Compressive,
 }
 
-bidirectional = {}
+bidirectional = {
+    "Compressive": BidirectionalCompressive
+}
+
 multiobject = {}
 
 

@@ -33,8 +33,9 @@ def multiobject(tracker, start, stop, basepath, initialrect, paths):
         return multiobjecttrackers[tracker].track(tracker, start, stop, basepath, paths)
     return None
 
-def bidirectional(tracker, label, start, stop, basepath, initialrect, paths):
+def bidirectional(tracker, start, stop, basepath, pathid, paths):
     if tracker in bidirectionaltrackers:
-        return bidirectionaltrackers[tracker].track(tracker, label, start, stop, basepath, initialrect)
+        tracker = bidirectionaltrackers[tracker]()
+        return tracker.track(pathid, start, stop, basepath, paths)
     return None
 

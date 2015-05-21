@@ -11,7 +11,7 @@ class Online:
         raise NotImplementedError("Must implement the tracking method")
 
 class Bidirectional:
-    def track(self, pathid, start, stop, initialrect, finalrect, basepath, paths):
+    def track(self, pathid, start, stop, basepath, paths):
         raise NotImplementedError("Must implement the tracking method")
 
 class MultiObject:
