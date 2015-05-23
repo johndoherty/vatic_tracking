@@ -59,7 +59,6 @@ class OpticalFlow(Online):
             maxx = min(imagesize[1], maxx + padx)
             miny = max(0, miny - pady)
             maxy = min(imagesize[0], maxy + pady)
-            print minx, maxx, miny, maxy
             box = vision.Box(
                 minx,
                 miny,
