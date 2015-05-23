@@ -18,9 +18,9 @@ void compressivetrack(Rect initialBox, string basePath,
         ct.processFrame(gray, box);
         boxes.push_back(box);
         rectangle(gray, box, Scalar(0));
-        std::cout << gray.size() << std::endl;
+        /*
         std::stringstream ss;
-        /*ss << "debug/" << i << ".jpg"; 
+        ss << "debug/" << i << ".jpg"; 
         std::string path = ss.str();
         std::cout << path << std::endl;
         if(imwrite(path, gray)) {
@@ -28,6 +28,7 @@ void compressivetrack(Rect initialBox, string basePath,
         } else {
             std::cout << "Write unsuccessful!!" << std::endl;
         }
-        waitKey(10);*/
+        waitKey(10);
+        */
     }
 }

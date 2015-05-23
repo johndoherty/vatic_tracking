@@ -54,6 +54,8 @@ class Compressive(Online):
         cdef vector[Rect] boxes
         cdef Rect r
         path = paths[pathid]
+        if start not in path.boxes:
+            return Path(path.label, path.id, [])
         box = path.boxes[start]
         initialrect = (box.xtl, box.ytl, box.xbr-box.xtl, box.ybr-box.ytl)
         pyrecttorect(initialrect, r)
@@ -66,6 +68,8 @@ class BidirectionalCompressive(Bidirectional):
         cdef Rect initial
         cdef Rect final
         path = paths[pathid]
+        if start not in path.boxes or stop not in path.boxes:
+            return Path(path.label, path.id, [])
         startbox = path.boxes[start]
         stopbox = path.boxes[stop]
         initialrect = (startbox.xtl, startbox.ytl, startbox.xbr-startbox.xtl, startbox.ybr-startbox.ytl)

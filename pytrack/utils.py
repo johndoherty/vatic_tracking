@@ -16,7 +16,8 @@ class Frames:
     def getframepath(self, frame):
         folder1 = frame / 100;
         folder2 = frame / 10000;
-        return os.path.join(self.basepath, str(folder1), str(folder2), str(frame) + ".jpg")
+        path = os.path.join(self.basepath, str(folder2), str(folder1), str(frame) + ".jpg")
+        return path
 
     def __len__(self):
         f = 1
