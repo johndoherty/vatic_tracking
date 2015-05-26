@@ -2,18 +2,13 @@ import numpy as np
 import cv2
 from tracking.base import Online
 from utils import getframes
-import vision
 from tracking.base import Path
+from optflowutil import getpoints, meanshift
 
-MAX_CORNERS = 50
-CORNER_QUALITY = 0.1;
-MIN_CORNER_DIST = 2;
-
-PAD = 5
 
 class OpticalFlow(Online):
-    def track(self, pathid, start, stop, basepath, paths):
 
+    def track(self, pathid, start, stop, basepath, paths):
         path = paths[pathid]
 
         if start not in path.boxes:
@@ -27,56 +22,25 @@ class OpticalFlow(Online):
 
         prevpoints = np.array([])
 
-        box = startbox
-        boxes = {}
+        points = getpoints(start, stop, frames, startbox)
+        boxes = meanshift(start, stop, points, initialrect, imagesize)
 
-        mask = np.zeros(imagesize, np.uint8)
-        minx = max(0, box.xtl - PAD)
-        maxx = min(imagesize[1], box.xbr + PAD)
-        miny = max(0, box.ytl - PAD)
-        maxy = min(imagesize[0], box.ybr + PAD)
-        mask[miny:maxy, minx:maxx] = 255
-
-        prevpoints = cv2.goodFeaturesToTrack(previmage, MAX_CORNERS, CORNER_QUALITY, MIN_CORNER_DIST, prevpoints, mask)
-
-
+        """
         for i in range(start, stop):
-            nextimage = frames[i]
-            if nextimage is None:
-                break
+            image = frames[i]
 
-            nextpoints, status, err = cv2.calcOpticalFlowPyrLK(previmage, nextimage, prevpoints);
-            prevmatched = prevpoints[status == 1]
-            nextmatched = nextpoints[status == 1]
-            minx = nextmatched[:, 0].min()
-            maxx = nextmatched[:, 0].max()
-            miny = nextmatched[:, 1].min()
-            maxy = nextmatched[:, 1].max()
-            padx = max(0, (initialrect[2] - (maxx - minx)) / 2)
-            pady = max(0, (initialrect[3] - (maxy - miny)) / 2)
+            if i in points:
+                #cv2.circle(image, tuple(forwardmean[i,:]), 6, 0, 3)
+                for row in points[i]:
+                    cv2.circle(image, tuple(row), 4, 0, 1)
 
-            minx = max(0, minx - padx)
-            maxx = min(imagesize[1], maxx + padx)
-            miny = max(0, miny - pady)
-            maxy = min(imagesize[0], maxy + pady)
-            box = vision.Box(
-                minx,
-                miny,
-                maxx,
-                maxy,
-                frame=i,
-                generated=True
-            )
-            transform = cv2.estimateRigidTransform(prevpoints, nextpoints, False);
-            boxes[i] = box
-            previmage = nextimage
-            prevpoints = nextpoints
+            if i in boxes:
+                box = boxes[i]
+                cv2.rectangle(image, (box.xtl,box.ytl), (box.xbr,box.ybr), 255,2)
 
-            # Draw it on image
-            #x,y,w,h = rect
-            #cv2.rectangle(nextimage, (box.xtl,box.ytl), (box.xbr,box.ybr), 255,2)
-            #cv2.imshow('img2',nextimage)
-            #cv2.waitKey(20)
+            cv2.imshow('Optical flow tracking', image)
+            cv2.waitKey(40)
+        """
 
         cv2.destroyAllWindows()
         return Path(path.label, path.id, boxes)

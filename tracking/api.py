@@ -25,7 +25,7 @@ def gettrackers():
 def online(tracker, start, stop, basepath, pathid, paths):
     if tracker in onlinetrackers:
         tracker = onlinetrackers[tracker]()
-        return filterboxes(tracker.track(pathid, start, stop, basepath, paths))
+        return tracker.track(pathid, start, stop, basepath, paths)
     return None
 
 def multiobject(tracker, start, stop, basepath, initialrect, paths):
