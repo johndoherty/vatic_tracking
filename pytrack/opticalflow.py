@@ -9,10 +9,13 @@ from optflowutil import getpoints, meanshift
 class OpticalFlow(Online):
 
     def track(self, pathid, start, stop, basepath, paths):
+        if pathid not in paths:
+            return Path(None, None, {})
+
         path = paths[pathid]
 
         if start not in path.boxes:
-            return Path(path.label, path.id, [])
+            return Path(path.label, path.id, {})
 
         startbox = path.boxes[start]
         initialrect = (startbox.xtl, startbox.ytl, startbox.xbr-startbox.xtl, startbox.ybr-startbox.ytl)
