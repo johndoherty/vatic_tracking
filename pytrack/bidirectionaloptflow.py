@@ -1,11 +1,11 @@
 import numpy as np
 import cv2
-from tracking.base import Online
+from tracking.base import Online, Bidirectional
 from utils import getframes
 from tracking.base import Path
 from optflowutil import getpoints, meanshift
 
-class BidirectionalOptFlow(Online):
+class BidirectionalOptFlow(Bidirectional):
 
     def track(self, pathid, start, stop, basepath, paths):
         path = paths[pathid]
