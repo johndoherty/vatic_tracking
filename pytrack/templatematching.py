@@ -5,7 +5,23 @@ from utils import getframes
 from tracking.base import Online, Bidirectional
 from tracking.base import Path
 
-SAMPLE_RADIUS = 0.5
+PADDING = 3
+
+def filterlost(boxes, imagesize):
+    newboxes = {}
+    frames = sorted(boxes.keys())
+    for frame in frames:
+        newboxes[frame] = boxes[frame]
+        if (frame != frames[0] and 
+            (newboxes[frame].xtl < PADDING or
+             newboxes[frame].ytl < PADDING or
+             newboxes[frame].xbr > (imagesize[1] - PADDING) or
+             newboxes[frame].ybr > (imagesize[0] - PADDING))):
+            print "Lost at frame {0}".format(frame)
+            newboxes[frame].lost = True
+            break
+
+    return newboxes
 
 def samplerects(initialrect, imagesize):
     samples = [initialrect,]
@@ -33,21 +49,13 @@ def templatematch(start, stop, initialrect, frames):
         rectscores = []
         prevpatch = previmage[prevrect[1]:prevrect[1] + prevrect[3], prevrect[0]:prevrect[0] + prevrect[2]]
         samples = samplerects(prevrect, imagesize)
-        #print "Samples", len(samples)
         for rect in samples:
             patch = image[rect[1]:rect[1] + rect[3], rect[0]:rect[0] + rect[2]]
             #score = np.sum(np.square(prevpatch - patch))
-            score = np.sum((prevpatch - patch))
+            #score = np.sum((prevpatch - patch))
+            score = np.sum(np.absolute(prevpatch - patch))
+            #score = np.sum(patch)
             rectscores.append((rect, score))
-
-        """
-        sortedsamples = sorted(rectscores, cmp=lambda s1,s2: cmp(s1[1], s2[1]))
-        for rect in [sample[0] for sample in sortedsamples[:8]]:
-            cv2.rectangle(image, (rect[0], rect[1]), (rect[0]+rect[2],rect[1]+rect[3]), 255, 1)
-
-        cv2.imshow('Template tracking', image)
-        cv2.waitKey(40)
-        """
 
         best = min(rectscores, key=lambda a: a[1])
         prevrect = best[0]
@@ -66,16 +74,17 @@ def templatematch(start, stop, initialrect, frames):
 
 class TemplateMatch(Online):
     def track(self, pathid, start, stop, basepath, paths):
-
         path = paths[pathid]
 
         if start not in path.boxes:
             return Path(path.label, path.id, {})
 
+        print "Tracking from {0} to {1}".format(start, stop)
         startbox = path.boxes[start]
         initialrect = (startbox.xtl, startbox.ytl, startbox.xbr-startbox.xtl, startbox.ybr-startbox.ytl)
         frames = getframes(basepath, False)
         boxes = templatematch(start, stop, initialrect, frames)
+        boxes = filterlost(boxes, frames[0].shape)
 
         """
         for i in range(start, stop):
@@ -126,6 +135,7 @@ class BidirectionalTemplateMatch(Bidirectional):
                 boxes[frame] = forwardboxes[frame]
             elif frame > mergeframe and frame in backwardboxes:
                 boxes[frame] = backwardboxes[frame]
+
 
         """
         for i in range(start, stop):
