@@ -7,11 +7,6 @@
 #include "CompressiveTracker.h"
 #include <math.h>
 
-float boxdistance(Rect box1, Rect box2)
-{
-    return sqrt(pow((box1.x - box2.x), 2) +
-        pow((box1.y - box2.y), 2));
-}
 
 void bidirectionaltrack(cv::Rect initialBox, cv::Rect finalBox,
     std::string basePath, int start, int stop, vector<cv::Rect> &boxes)

@@ -3,6 +3,12 @@
 using namespace std;
 using namespace cv;
 
+float boxdistance(Rect box1, Rect box2)
+{
+    return sqrt(pow((box1.x - box2.x), 2) +
+        pow((box1.y - box2.y), 2));
+}
+
 void getFrame(int frame, string basePath, Mat& out, bool color) {
     Mat tmp;
     stringstream ss;

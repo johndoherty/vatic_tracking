@@ -28,6 +28,10 @@ cdef extern from "trackingmodule.h":
     cdef void alltracks(int start, int stop, string basePath,
         vector[vector[Rect]] boxes)
 
+    # ----------------- TLD -------------------
+    cdef void tldtrack(Rect initialBox, string basepath,
+        int start, int stop, vector[Rect] boxes)
+
 cdef boxestopath(vector[Rect] boxes, originalpath, start):
     pathboxes = {}
     for i in range(boxes.size()):
@@ -62,6 +66,36 @@ class Compressive(Online):
         compressivetrack(r, baseimagepath, start, stop, boxes)
         return boxestopath(boxes, path, start)
 
+# ----------------- TLD -------------------
+class TLD(Online):
+    def track(self, pathid, int start, int stop, string baseimagepath, paths):
+        cdef vector[Rect] boxes
+        cdef Rect r
+        path = paths[pathid]
+        if start not in path.boxes:
+            return Path(path.label, path.id, [])
+        box = path.boxes[start]
+        initialrect = (box.xtl, box.ytl, box.xbr-box.xtl, box.ybr-box.ytl)
+        pyrecttorect(initialrect, r)
+        tldtrack(r, baseimagepath, start, stop, boxes)
+        return boxestopath(boxes, path, start)
+class BiTLD(Bidirectional):
+    def track(self, pathid, int start, int stop, string baseimagepath, paths):
+        cdef vector[Rect] boxes
+        cdef Rect initial
+        cdef Rect final
+        path = paths[pathid]
+        if start not in path.boxes or stop not in path.boxes:
+            return Path(path.label, path.id, [])
+        startbox = path.boxes[start]
+        stopbox = path.boxes[stop]
+        initialrect = (startbox.xtl, startbox.ytl, startbox.xbr-startbox.xtl, startbox.ybr-startbox.ytl)
+        finalrect = (stopbox.xtl, stopbox.ytl, stopbox.xbr-stopbox.xtl, stopbox.ybr-stopbox.ytl)
+        pyrecttorect(initialrect, initial)
+        pyrecttorect(finalrect, final)
+        bidirectionaltrack(initial, final, baseimagepath, start, stop, boxes)
+        return boxestopath(boxes, path, start)
+
 class BidirectionalCompressive(Bidirectional):
     def track(self, pathid, int start, int stop, string baseimagepath, paths):
         cdef vector[Rect] boxes
@@ -82,10 +116,12 @@ class BidirectionalCompressive(Bidirectional):
 
 online = {
     "Compressive": Compressive,
+    "TLD": TLD,
 }
 
 bidirectional = {
-    "Compressive": BidirectionalCompressive
+    "Compressive": BidirectionalCompressive,
+    "BiTLD": BiTLD,
 }
 
 multiobject = {}
