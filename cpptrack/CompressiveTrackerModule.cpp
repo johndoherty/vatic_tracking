@@ -1,8 +1,7 @@
 #include "trackingmodule.h"
 #include "CompressiveTracker.h"
 
-
-void compressivetrack(Rect initialBox, string basePath,
+void compressivetrack(Rect initialBox, std::string basePath,
     int start, int stop, vector<Rect> &boxes)
 {
     CompressiveTracker ct;
