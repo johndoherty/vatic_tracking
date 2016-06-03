@@ -4,16 +4,16 @@
  */
 
 #include "trackingmodule.h"
-#include "CompressiveTracker.h"
+#include "TldTracker.h"
 #include <math.h>
+#include <algorithm>    // std::min
 
-
-void bidirectionaltrack(cv::Rect initialBox, cv::Rect finalBox,
+void bitldtrack(cv::Rect initialBox, cv::Rect finalBox,
     std::string basePath, int start, int stop, vector<cv::Rect> &boxes)
 {
     int totalboxes = stop-start;
     if (totalboxes  == 0) return;
-    CompressiveTracker forwardtracker, backwardtracker;
+    TldTracker forwardtracker, backwardtracker;
     vector<Rect> forwardboxes, backwardboxes;
     std::vector<Rect>::iterator backwardit;
     Rect forwardbox = initialBox;
@@ -24,6 +24,10 @@ void bidirectionaltrack(cv::Rect initialBox, cv::Rect finalBox,
 
     forwardtracker.init(forwardgray, forwardbox);
     backwardtracker.init(backwardgray, backwardbox);
+
+    //Added param
+    totalboxes = std::min(totalboxes, forwardtracker.tld.track_frame_num);
+
     forwardboxes.push_back(forwardbox);
     backwardit = backwardboxes.begin();
     backwardboxes.insert(backwardit, backwardbox);

@@ -20,3 +20,10 @@ void bidirectionaltrack(cv::Rect initialBox, cv::Rect finalBox, std::string base
 
 void alltracks(int start, int stop, std::string basePath, 
     std::vector<std::vector<cv::Rect> > &boxes);
+
+//----------------- TLD --------------------
+void tldtrack(cv::Rect initialBox, std::string basepath,
+    int start, int stop, std::vector<cv::Rect> &boxes);
+
+void bitldtrack(cv::Rect initialBox, cv::Rect finalBox, std::string basePath,
+    int start, int stop, std::vector<cv::Rect> &boxes);
